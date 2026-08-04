@@ -21,15 +21,16 @@
     const { side, type, start } = JSON.parse(raw);
     const remaining = durationFor(type) - (Date.now() - start);
 
-    const sideLabel = side.charAt(0).toUpperCase() + side.slice(1);
-    const typeLabel = type === 'pump' ? 'Pumped' : 'Fed';
-    document.getElementById('timerSide').textContent = `Last: ${typeLabel} ${sideLabel}`;
+    const typeLabel = type === 'pump' ? t('pumped') : t('fed');
+    const sideLabel = t(side);
+    document.getElementById('timerSide').textContent = `${t('lastFed')} ${typeLabel} ${sideLabel}`;
 
     const dispEl = document.getElementById('timerDisplay');
+    document.getElementById('stopBtn').textContent = t('stopBtn');
     document.getElementById('stopBtn').style.display = 'inline-block';
     if (remaining <= 0) {
       if (!chimePlayed) { chimePlayed = true; playChime(); triggerAlert(); }
-      dispEl.textContent = 'Feed now!';
+      dispEl.textContent = t('feedNow');
       dispEl.className = 'timer-display done';
     } else {
       const mins = Math.floor(remaining / 60000);

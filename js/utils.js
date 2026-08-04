@@ -1,7 +1,8 @@
-  const APP_VERSION = "1.10";
+  const APP_VERSION = "1.11";
   const STORAGE_KEY = 'feedingLog';
   const TIMER_KEY   = 'feedingTimer';
   const CFG_KEY     = 'feedingConfig';
+  const MED_HISTORY_KEY = 'medHistory';
 
   function getConfig() {
     const saved = JSON.parse(localStorage.getItem(CFG_KEY) || '{}');
@@ -9,6 +10,7 @@
       feedMins:  saved.feedMins  ?? 20,
       pumpMins:  saved.pumpMins  ?? 5,
       keepAwake: saved.keepAwake ?? true,
+      nightMode: saved.nightMode ?? true,
     };
   }
 
@@ -18,6 +20,13 @@
   }
 
   function getLog() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+
+  function getMedHistory() { return JSON.parse(localStorage.getItem(MED_HISTORY_KEY) || '[]'); }
+  function addMedHistory(entry) {
+    const h = getMedHistory();
+    h.unshift(entry);
+    localStorage.setItem(MED_HISTORY_KEY, JSON.stringify(h));
+  }
 
   function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
   function setBar(id, pct)  { const el = document.getElementById(id); if (el) el.style.width = pct + '%'; }

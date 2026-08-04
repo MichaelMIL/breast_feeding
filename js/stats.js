@@ -2,6 +2,8 @@
   function renderStats() {
     const entries = getLog();
     const now     = new Date();
+    const lang    = getLang();
+    const locale  = lang === 'he' ? 'he-IL' : undefined;
 
     const todayStr  = now.toDateString();
     const weekAgo   = now - 7 * 24 * 3600 * 1000;
@@ -28,11 +30,11 @@
 
     // set values
     setText('st-today', todayAll.length);
-    setText('st-today-sub', `${todayFeeds} feed · ${todayPumps} pump`);
+    setText('st-today-sub', t('feedSub', todayFeeds, todayPumps));
     setText('st-week', weekAll.length);
-    setText('st-week-sub', `avg ${weekAll.length ? (weekAll.length/7).toFixed(1) : 0}/day`);
+    setText('st-week-sub', t('weekSub', weekAll.length));
     setText('st-total', total);
-    setText('st-total-sub', `${feedCount} feed · ${pumpCount} pump`);
+    setText('st-total-sub', t('feedSub', feedCount, pumpCount));
 
     if (avgMs !== null) {
       const h = Math.floor(avgMs / 3600000);
@@ -61,7 +63,7 @@
       const d = new Date(now); d.setDate(d.getDate() - i);
       const ds = d.toDateString();
       days.push({
-        label: d.toLocaleDateString([], {weekday: 'short'}),
+        label: d.toLocaleDateString(locale, {weekday: 'short'}),
         count: entries.filter(e => new Date(e.time).toDateString() === ds).length
       });
     }
@@ -88,7 +90,7 @@
     const todayPoop= dToday.filter(d => d.type==='poop'||d.type==='both').length;
     setText('st-diaper-today-sub', `💧${todayPee} · 💩${todayPoop}`);
     setText('st-diaper-week', dWeek.length);
-    setText('st-diaper-week-sub', `avg ${dWeek.length ? (dWeek.length/7).toFixed(1) : 0}/day`);
+    setText('st-diaper-week-sub', t('avgPerDay', dWeek.length ? (dWeek.length/7).toFixed(1) : 0));
 
     const peePct  = Math.round(dPeeCount  / dTotal * 100);
     const poopPct = Math.round(dPoopCount / dTotal * 100);
@@ -101,7 +103,7 @@
       const d = new Date(now); d.setDate(d.getDate() - i);
       const ds = d.toDateString();
       ddays.push({
-        label: d.toLocaleDateString([], {weekday: 'short'}),
+        label: d.toLocaleDateString(locale, {weekday: 'short'}),
         count: diapers.filter(d => new Date(d.time).toDateString() === ds).length
       });
     }

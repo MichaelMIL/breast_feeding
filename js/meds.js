@@ -2,9 +2,16 @@
   const MED_KEY = 'medList';
   let medInterval = null;
   const medAlerted = new Set(); // IDs that have already fired their "due" alert
+  let currentTakeMedId = null;
 
   function getMeds() { return JSON.parse(localStorage.getItem(MED_KEY) || '[]'); }
   function saveMeds(list) { localStorage.setItem(MED_KEY, JSON.stringify(list)); }
+
+  function localDatetimeValueMed(ts) {
+    const d = new Date(ts);
+    const pad = n => String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
 
   function openAddMed() {
     document.getElementById('medNameInput').value = '';
@@ -32,20 +39,39 @@
     renderMeds();
   }
 
-  function takeMed(id) {
+  function openTakeMed(id) {
+    const med = getMeds().find(m => m.id === id);
+    if (!med) return;
+    currentTakeMedId = id;
+    document.getElementById('takeMedName').textContent = med.name;
+    document.getElementById('takeMedTimeInput').value = localDatetimeValueMed(Date.now());
+    document.getElementById('takeMedOverlay').classList.add('open');
+  }
+
+  function closeTakeMed() {
+    document.getElementById('takeMedOverlay').classList.remove('open');
+    currentTakeMedId = null;
+  }
+
+  function confirmTakeMed() {
+    if (!currentTakeMedId) return;
     unlockAudio();
     const meds = getMeds();
-    const med = meds.find(m => m.id === id);
-    if (!med) return;
-    med.lastTaken = Date.now();
+    const med = meds.find(m => m.id === currentTakeMedId);
+    if (!med) { closeTakeMed(); return; }
+    const timeVal = document.getElementById('takeMedTimeInput').value;
+    const time = timeVal ? new Date(timeVal).getTime() : Date.now();
+    med.lastTaken = time;
     saveMeds(meds);
-    // Reset alert so it can fire again next cycle
-    medAlerted.delete(id);
+    medAlerted.delete(currentTakeMedId);
+    addMedHistory({ medName: med.name, time });
+    closeTakeMed();
     renderMeds();
+    renderHistory();
   }
 
   function deleteMed(id) {
-    if (!confirm('Remove this medication?')) return;
+    if (!confirm(t('removeThisMed'))) return;
     const meds = getMeds().filter(m => m.id !== id);
     saveMeds(meds);
     medAlerted.delete(id);
@@ -53,7 +79,7 @@
   }
 
   function fmtCountdown(ms) {
-    if (ms <= 0) return 'Due now!';
+    if (ms <= 0) return t('dueNow');
     const totalSecs = Math.floor(ms / 1000);
     const h = Math.floor(totalSecs / 3600);
     const m = Math.floor((totalSecs % 3600) / 60);
@@ -67,16 +93,18 @@
     if (!list) return;
     const meds = getMeds();
     if (meds.length === 0) {
-      list.innerHTML = '<div class="med-empty">No medications added yet.<br>Tap + to add one.</div>';
+      list.innerHTML = `<div class="med-empty">${t('noMeds').replace('\n','<br>')}</div>`;
       return;
     }
     const now = Date.now();
+    const lang = getLang();
+    const locale = lang === 'he' ? 'he-IL' : undefined;
     list.innerHTML = meds.map(med => {
       const intervalMs = med.intervalHours * 3600 * 1000;
       const remaining  = med.lastTaken ? (med.lastTaken + intervalMs) - now : 0;
       const isDue      = remaining <= 0;
       const countdownClass = isDue ? 'due' : 'ok';
-      const countdownText  = isDue ? 'Due now!' : fmtCountdown(remaining);
+      const countdownText  = isDue ? t('dueNow') : fmtCountdown(remaining);
 
       // Fire alert once per due event
       if (isDue && !medAlerted.has(med.id)) {
@@ -84,26 +112,25 @@
         playChime();
         triggerAlert();
       } else if (!isDue && medAlerted.has(med.id)) {
-        // Med was taken, clear alert flag so next due fires again
         medAlerted.delete(med.id);
       }
 
       const lastTakenText = med.lastTaken
-        ? 'Last taken: ' + new Date(med.lastTaken).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : 'Not yet taken';
+        ? t('lastTaken') + ' ' + new Date(med.lastTaken).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
+        : t('notYetTaken');
 
       return `<div class="med-card">
         <div class="med-card-top">
           <div>
             <div class="med-name">${escHtml(med.name)}</div>
-            <div class="med-interval">Every ${med.intervalHours}h</div>
+            <div class="med-interval">${t('everyH', med.intervalHours)}</div>
           </div>
           <button class="med-delete-btn" onclick="deleteMed('${med.id}')" aria-label="Delete">✕</button>
         </div>
         <div class="med-countdown ${countdownClass}">${countdownText}</div>
         <div class="med-card-bottom">
           <span class="med-last">${lastTakenText}</span>
-          <button class="take-btn" onclick="takeMed('${med.id}')">Take now</button>
+          <button class="take-btn" onclick="openTakeMed('${med.id}')">${t('takeNow')}</button>
         </div>
       </div>`;
     }).join('');
