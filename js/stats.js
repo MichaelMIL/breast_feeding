@@ -116,4 +116,34 @@
         </div>
         <div class="chart-day">${d.label}</div>
       </div>`).join('');
+
+    // Medication stats
+    const medHistory = getMedHistory();
+    const mToday = medHistory.filter(m => new Date(m.time).toDateString() === todayStr);
+    const mWeek  = medHistory.filter(m => m.time >= weekAgo);
+
+    setText('st-med-today', mToday.length);
+    const todayGroups = {};
+    mToday.forEach(m => { todayGroups[m.medName] = (todayGroups[m.medName] || 0) + 1; });
+    setText('st-med-today-sub', Object.entries(todayGroups).map(([n,c]) => `${n}×${c}`).join(' · ') || '—');
+    setText('st-med-week', mWeek.length);
+    setText('st-med-week-sub', t('avgPerDay', mWeek.length ? (mWeek.length / 7).toFixed(1) : 0));
+
+    const meds = getMeds();
+    const breakdownEl = document.getElementById('st-med-breakdown');
+    if (!meds.length) {
+      breakdownEl.innerHTML = `<div style="color:var(--text-sub);font-size:0.85rem;padding:8px 0;">${t('noMedHistory')}</div>`;
+    } else {
+      breakdownEl.innerHTML = meds.map(med => {
+        const todayCount = mToday.filter(m => m.medName === med.name).length;
+        const weekCount  = mWeek.filter(m => m.medName === med.name).length;
+        const lastStr    = med.lastTaken
+          ? new Date(med.lastTaken).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
+          : t('notYetTaken');
+        return `<div class="med-stat-row">
+          <span class="med-stat-name">${escHtml(med.name)}</span>
+          <span class="med-stat-info">${t('todayDoses', todayCount)} · 7d: ${weekCount} · ${t('lastTaken')} ${lastStr}</span>
+        </div>`;
+      }).join('');
+    }
   }

@@ -72,6 +72,11 @@ const STRINGS = {
     feedSub:        (f,p) => `${f} feed · ${p} pump`,
     weekSub:        n => `avg ${(n/7).toFixed(1)}/day`,
     min:            'min',
+    medsDosesToday: 'Doses today',
+    medsDosesWeek:  'Doses 7 days',
+    medsBreakdown:  'Per medication',
+    noMedHistory:   'No doses recorded yet',
+    todayDoses:     d => `today: ${d}`,
   },
   he: {
     appTitle:       'מעקב הנקה',
@@ -144,6 +149,11 @@ const STRINGS = {
     feedSub:        (f,p) => `${f} הנקה · ${p} שאיבה`,
     weekSub:        n => `ממוצע ${(n/7).toFixed(1)}/יום`,
     min:            'דק׳',
+    medsDosesToday: 'מנות היום',
+    medsDosesWeek:  'מנות 7 ימים',
+    medsBreakdown:  'לפי תרופה',
+    noMedHistory:   'אין מנות מתועדות עדיין',
+    todayDoses:     d => `היום: ${d}`,
   }
 };
 

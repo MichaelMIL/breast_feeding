@@ -1,7 +1,31 @@
+  function fmtDuration(ms) {
+    if (!ms || ms <= 0) return '';
+    const totalSecs = Math.floor(ms / 1000);
+    const h = Math.floor(totalSecs / 3600);
+    const m = Math.floor((totalSecs % 3600) / 60);
+    const s = totalSecs % 60;
+    if (h > 0) return `${h}h ${m}m`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  }
+
+  function setLastEntryDuration(ms) {
+    const entries = getLog();
+    if (entries.length > 0 && !entries[0].duration) {
+      entries[0].duration = ms;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+  }
+
   function record(side, type) {
     unlockAudio();
     chimePlayed = false;
     const entries = getLog();
+    // Save elapsed time for the session that's ending
+    const prevRaw = localStorage.getItem(TIMER_KEY);
+    if (prevRaw && entries.length > 0 && !entries[0].duration) {
+      entries[0].duration = Date.now() - JSON.parse(prevRaw).start;
+    }
     entries.unshift({ side, type, time: Date.now() });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
     // Pumping is logged but does NOT start/reset the feeding countdown timer
@@ -19,7 +43,7 @@
 
     // Build unified entries
     const all = [];
-    getLog().forEach(e => all.push({ kind: e.type === 'pump' ? 'pump' : 'feed', side: e.side, time: e.time }));
+    getLog().forEach(e => all.push({ kind: e.type === 'pump' ? 'pump' : 'feed', side: e.side, time: e.time, duration: e.duration }));
     getDiapers().forEach(d => all.push({ kind: 'diaper', dtype: d.type, time: d.time }));
     getMedHistory().forEach(m => all.push({ kind: 'med', medName: m.medName, time: m.time }));
     all.sort((a,b) => b.time - a.time);
@@ -39,23 +63,25 @@
       if (e.kind === 'feed') {
         const sideLabel = t(e.side);
         const dotClass  = e.side;
+        const durStr    = e.duration ? ` · ${fmtDuration(e.duration)}` : '';
         return `<div class="history-item">
         <div class="history-dot ${dotClass}"></div>
         <span class="history-type feed">${t('feed')}</span>
         <span class="history-side ${e.side}">${sideLabel}</span>
         <span>${date}</span>
-        <span class="history-time">${time}</span>
+        <span class="history-time">${time}${durStr}</span>
       </div>`;
       }
       if (e.kind === 'pump') {
         const sideLabel = t(e.side);
         const dotClass  = 'pump-' + e.side;
+        const durStr    = e.duration ? ` · ${fmtDuration(e.duration)}` : '';
         return `<div class="history-item">
         <div class="history-dot ${dotClass}"></div>
         <span class="history-type pump">${t('pump')}</span>
         <span class="history-side pump-${e.side}">${sideLabel}</span>
         <span>${date}</span>
-        <span class="history-time">${time}</span>
+        <span class="history-time">${time}${durStr}</span>
       </div>`;
       }
       if (e.kind === 'diaper') {

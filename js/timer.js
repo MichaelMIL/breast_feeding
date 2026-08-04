@@ -8,11 +8,17 @@
   }
 
   function stopTimer() {
+    const raw = localStorage.getItem(TIMER_KEY);
+    if (raw) {
+      const { start } = JSON.parse(raw);
+      setLastEntryDuration(Date.now() - start);
+    }
     if (timerInterval) clearInterval(timerInterval);
     timerInterval = null;
     localStorage.removeItem(TIMER_KEY);
     chimePlayed = false;
     resetTimerUI();
+    renderHistory();
   }
 
   function tick() {
