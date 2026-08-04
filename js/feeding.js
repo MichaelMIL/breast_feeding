@@ -28,11 +28,8 @@
     }
     entries.unshift({ side, type, time: Date.now() });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-    // Pumping is logged but does NOT start/reset the feeding countdown timer
-    if (type !== 'pump') {
-      localStorage.setItem(TIMER_KEY, JSON.stringify({ side, type, start: Date.now() }));
-      startTimer();
-    }
+    localStorage.setItem(TIMER_KEY, JSON.stringify({ side, type, start: Date.now() }));
+    startTimer();
     renderHistory();
   }
 

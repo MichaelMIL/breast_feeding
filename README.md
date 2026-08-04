@@ -2,7 +2,7 @@
 
 A progressive web app (PWA) for tracking breastfeeding sessions, pumping, diaper changes, and medications.
 
-**Current Version: v1.16**
+**Current Version: v1.17**
 
 ## Features
 
