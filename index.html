@@ -14,7 +14,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 24px 16px 40px;
+      padding: 24px 16px 88px;
       color: #3a2a1e;
     }
 
@@ -186,6 +186,73 @@
     .btn-save   { background: #c0724a; color: #fff; }
     .btn-cancel { background: #f0e8e0; color: #7a4a2e; }
     .btn-save:hover, .btn-cancel:hover { opacity: 0.85; }
+
+    /* ── pages ── */
+    .page { display: none; width: 100%; max-width: 400px; flex-direction: column; align-items: center; }
+    .page.active { display: flex; }
+
+    /* ── bottom nav ── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 64px;
+      background: #fff;
+      border-top: 1px solid #ede0d4;
+      display: flex;
+      z-index: 50;
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+    }
+    .nav-btn {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 3px;
+      background: none; border: none; cursor: pointer;
+      font-size: 0.68rem; font-weight: 600; letter-spacing: 0.05em;
+      color: #c0a890; transition: color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-btn .nav-icon { font-size: 1.4rem; line-height: 1; }
+    .nav-btn.active { color: #c0724a; }
+
+    /* ── stats page ── */
+    .stats-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; width: 100%; max-width: 380px; margin-bottom: 14px;
+    }
+    .stat-card {
+      background: #fff; border-radius: 16px; padding: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06); text-align: center;
+    }
+    .stat-card.wide { grid-column: 1 / -1; text-align: left; padding: 18px 20px; }
+    .stat-card-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #b09080; margin-bottom: 6px; }
+    .stat-card-value { font-size: 2rem; font-weight: 700; color: #3a2a1e; line-height: 1; }
+    .stat-card-sub   { font-size: 0.75rem; color: #aaa; margin-top: 4px; }
+
+    /* split bar */
+    .split-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+    .split-label { font-size: 0.78rem; font-weight: 600; width: 38px; flex-shrink: 0; }
+    .split-track { flex: 1; height: 10px; background: #f0e8e0; border-radius: 99px; overflow: hidden; }
+    .split-fill  { height: 100%; border-radius: 99px; transition: width 0.4s; }
+    .split-pct   { font-size: 0.75rem; color: #999; width: 34px; text-align: right; flex-shrink: 0; }
+    .split-left-fill  { background: #e07ba0; }
+    .split-right-fill { background: #7ab8e0; }
+    .split-feed-fill  { background: #e07ba0; }
+    .split-pump-fill  { background: #9060b0; }
+
+    /* 7-day chart */
+    .chart-bars {
+      display: flex; align-items: flex-end; gap: 6px;
+      height: 90px; margin-top: 12px;
+    }
+    .chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .chart-bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+    .chart-bar {
+      width: 100%; border-radius: 5px 5px 0 0;
+      background: linear-gradient(180deg, #f0a8c0, #c0507a);
+      min-height: 3px; transition: height 0.4s;
+    }
+    .chart-bar.zero { background: #f0e8e0; border-radius: 5px; min-height: 4px; }
+    .chart-day { font-size: 0.65rem; color: #bbb; font-weight: 600; }
+    .chart-num { font-size: 0.65rem; color: #c0724a; font-weight: 700; }
+    .stats-section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b09080; margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -201,6 +268,7 @@
     <div class="timer-display" id="timerDisplay">—</div>
   </div>
 
+  <div id="page-tracker" class="page active">
   <!-- Nursing -->
   <div class="btn-group">
     <div class="section-label">Nursing</div>
@@ -404,6 +472,70 @@
   </div>
 
   <div class="app-version" id="appVersion"></div>
+  </div><!-- /page-tracker -->
+
+  <!-- Stats page -->
+  <div id="page-stats" class="page">
+    <div style="width:100%;max-width:380px;margin-bottom:20px;">
+      <h2 style="font-size:1.2rem;font-weight:700;color:#7a4a2e;">Statistics</h2>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-label">Today</div>
+        <div class="stat-card-value" id="st-today">—</div>
+        <div class="stat-card-sub" id="st-today-sub"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Last 7 days</div>
+        <div class="stat-card-value" id="st-week">—</div>
+        <div class="stat-card-sub" id="st-week-sub"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Avg. interval</div>
+        <div class="stat-card-value" id="st-interval">—</div>
+        <div class="stat-card-sub">between sessions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Total sessions</div>
+        <div class="stat-card-value" id="st-total">—</div>
+        <div class="stat-card-sub" id="st-total-sub"></div>
+      </div>
+
+      <div class="stat-card wide">
+        <div class="stat-card-label" style="margin-bottom:12px;">Left / Right split</div>
+        <div class="split-row">
+          <span class="split-label" style="color:#c0507a;">Left</span>
+          <div class="split-track"><div class="split-fill split-left-fill" id="st-left-bar" style="width:50%"></div></div>
+          <span class="split-pct" id="st-left-pct">—</span>
+        </div>
+        <div class="split-row">
+          <span class="split-label" style="color:#4a80c0;">Right</span>
+          <div class="split-track"><div class="split-fill split-right-fill" id="st-right-bar" style="width:50%"></div></div>
+          <span class="split-pct" id="st-right-pct">—</span>
+        </div>
+      </div>
+
+      <div class="stat-card wide">
+        <div class="stat-card-label" style="margin-bottom:12px;">Feed / Pump split</div>
+        <div class="split-row">
+          <span class="split-label" style="color:#c0507a;">Feed</span>
+          <div class="split-track"><div class="split-fill split-feed-fill" id="st-feed-bar" style="width:50%"></div></div>
+          <span class="split-pct" id="st-feed-pct">—</span>
+        </div>
+        <div class="split-row">
+          <span class="split-label" style="color:#9060b0;">Pump</span>
+          <div class="split-track"><div class="split-fill split-pump-fill" id="st-pump-bar" style="width:50%"></div></div>
+          <span class="split-pct" id="st-pump-pct">—</span>
+        </div>
+      </div>
+
+      <div class="stat-card wide">
+        <div class="stat-card-label">Last 7 days</div>
+        <div class="chart-bars" id="st-chart"></div>
+      </div>
+    </div>
+  </div><!-- /page-stats -->
 
   <!-- Settings modal -->
   <div class="overlay" id="overlay" onclick="closeSettings()">
@@ -433,8 +565,17 @@
     </div>
   </div>
 
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="nav-tracker" onclick="showTab('tracker')">
+      <span class="nav-icon">🤱</span>Track
+    </button>
+    <button class="nav-btn" id="nav-stats" onclick="showTab('stats')">
+      <span class="nav-icon">📊</span>Stats
+    </button>
+  </nav>
+
 <script>
-  const APP_VERSION = "1.2";
+  const APP_VERSION = "1.3";
   const STORAGE_KEY = 'feedingLog';
   const TIMER_KEY   = 'feedingTimer';
   const CFG_KEY     = 'feedingConfig';
@@ -613,6 +754,96 @@
     localStorage.setItem(CFG_KEY, JSON.stringify({ feedMins, pumpMins }));
     closeSettings();
   }
+
+  // Tab switching
+  function showTab(tab) {
+    document.getElementById('page-tracker').classList.toggle('active', tab === 'tracker');
+    document.getElementById('page-stats').classList.toggle('active', tab === 'stats');
+    document.getElementById('nav-tracker').classList.toggle('active', tab === 'tracker');
+    document.getElementById('nav-stats').classList.toggle('active', tab === 'stats');
+    if (tab === 'stats') renderStats();
+  }
+
+  // Stats
+  function renderStats() {
+    const entries = getLog();
+    const now     = new Date();
+
+    const todayStr  = now.toDateString();
+    const weekAgo   = now - 7 * 24 * 3600 * 1000;
+
+    const todayAll  = entries.filter(e => new Date(e.time).toDateString() === todayStr);
+    const weekAll   = entries.filter(e => e.time >= weekAgo);
+
+    const todayFeeds = todayAll.filter(e => (e.type||'feed') === 'feed').length;
+    const todayPumps = todayAll.filter(e => e.type === 'pump').length;
+
+    // avg interval (all time, sorted chronologically)
+    const sorted = [...entries].sort((a,b) => a.time - b.time);
+    let avgMs = null;
+    if (sorted.length >= 2) {
+      const diffs = sorted.slice(1).map((e,i) => e.time - sorted[i].time);
+      avgMs = diffs.reduce((a,b) => a+b, 0) / diffs.length;
+    }
+
+    const total      = entries.length;
+    const leftCount  = entries.filter(e => e.side === 'left').length;
+    const rightCount = entries.filter(e => e.side === 'right').length;
+    const feedCount  = entries.filter(e => (e.type||'feed') === 'feed').length;
+    const pumpCount  = entries.filter(e => e.type === 'pump').length;
+
+    // set values
+    setText('st-today', todayAll.length);
+    setText('st-today-sub', `${todayFeeds} feed · ${todayPumps} pump`);
+    setText('st-week', weekAll.length);
+    setText('st-week-sub', `avg ${weekAll.length ? (weekAll.length/7).toFixed(1) : 0}/day`);
+    setText('st-total', total);
+    setText('st-total-sub', `${feedCount} feed · ${pumpCount} pump`);
+
+    if (avgMs !== null) {
+      const h = Math.floor(avgMs / 3600000);
+      const m = Math.floor((avgMs % 3600000) / 60000);
+      setText('st-interval', h > 0 ? `${h}h ${m}m` : `${m}m`);
+    } else {
+      setText('st-interval', '—');
+    }
+
+    // splits
+    const lr = leftCount + rightCount || 1;
+    const fp = feedCount + pumpCount  || 1;
+    const lp = Math.round(leftCount  / lr * 100);
+    const rp = Math.round(rightCount / lr * 100);
+    const fdp = Math.round(feedCount / fp * 100);
+    const pp  = Math.round(pumpCount / fp * 100);
+
+    setBar('st-left-bar',  lp);  setText('st-left-pct',  total ? lp  + '%' : '—');
+    setBar('st-right-bar', rp);  setText('st-right-pct', total ? rp  + '%' : '—');
+    setBar('st-feed-bar',  fdp); setText('st-feed-pct',  total ? fdp + '%' : '—');
+    setBar('st-pump-bar',  pp);  setText('st-pump-pct',  total ? pp  + '%' : '—');
+
+    // 7-day bar chart
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now); d.setDate(d.getDate() - i);
+      const ds = d.toDateString();
+      days.push({
+        label: d.toLocaleDateString([], {weekday: 'short'}),
+        count: entries.filter(e => new Date(e.time).toDateString() === ds).length
+      });
+    }
+    const maxCount = Math.max(...days.map(d => d.count), 1);
+    document.getElementById('st-chart').innerHTML = days.map(d => `
+      <div class="chart-col">
+        <div class="chart-num">${d.count || ''}</div>
+        <div class="chart-bar-wrap">
+          <div class="chart-bar${d.count === 0 ? ' zero' : ''}" style="height:${Math.round(d.count/maxCount*72)}px"></div>
+        </div>
+        <div class="chart-day">${d.label}</div>
+      </div>`).join('');
+  }
+
+  function setText(id, val) { document.getElementById(id).textContent = val; }
+  function setBar(id, pct)  { document.getElementById(id).style.width = pct + '%'; }
 
   // Init
   renderHistory();
