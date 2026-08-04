@@ -600,7 +600,10 @@
       </div>
 
       <div class="setting-row">
-        <label>Keep screen on</label>
+        <div>
+          <label style="display:block;">Keep screen on</label>
+          <span id="wakeLockStatus" style="font-size:0.72rem;color:#aaa;"></span>
+        </div>
         <div class="toggle-wrap">
           <label class="toggle">
             <input type="checkbox" id="cfgWakeLock" checked/>
@@ -626,7 +629,7 @@
   </nav>
 
 <script>
-  const APP_VERSION = "1.5";
+  const APP_VERSION = "1.6";
   const STORAGE_KEY = 'feedingLog';
   const TIMER_KEY   = 'feedingTimer';
   const CFG_KEY     = 'feedingConfig';
@@ -681,24 +684,65 @@
 
   // Wake lock
   let wakeLock = null;
+  let wakeLockHeartbeat = null;
 
-  async function applyWakeLock() {
-    const enabled = getConfig().keepAwake !== false;
-    if (enabled && 'wakeLock' in navigator) {
-      try {
-        if (!wakeLock || wakeLock.released) {
-          wakeLock = await navigator.wakeLock.request('screen');
+  function setWakeLockStatus(text, color) {
+    const el = document.getElementById('wakeLockStatus');
+    if (el) { el.textContent = text; el.style.color = color; }
+  }
+
+  async function acquireWakeLock() {
+    if (!('wakeLock' in navigator)) {
+      setWakeLockStatus('Not supported by this browser', '#e0a060');
+      return;
+    }
+    if (document.visibilityState !== 'visible') return;
+    if (wakeLock && !wakeLock.released) return; // already held
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+      setWakeLockStatus('Active — screen will stay on', '#2d7a4a');
+      // Re-acquire immediately if the browser drops it
+      wakeLock.addEventListener('release', () => {
+        setWakeLockStatus('Released — reacquiring…', '#c0724a');
+        if (document.visibilityState === 'visible' && getConfig().keepAwake !== false) {
+          setTimeout(acquireWakeLock, 300);
         }
-      } catch (_) {}
-    } else if (wakeLock && !wakeLock.released) {
-      wakeLock.release();
-      wakeLock = null;
+      });
+    } catch (e) {
+      setWakeLockStatus('Could not lock: ' + e.message, '#c05050');
     }
   }
 
-  // Re-acquire after tab comes back (iOS/Android release it on hide)
+  function releaseWakeLock() {
+    if (wakeLockHeartbeat) { clearInterval(wakeLockHeartbeat); wakeLockHeartbeat = null; }
+    if (wakeLock && !wakeLock.released) wakeLock.release();
+    wakeLock = null;
+    setWakeLockStatus('Disabled', '#bbb');
+  }
+
+  async function applyWakeLock() {
+    const enabled = getConfig().keepAwake !== false;
+    if (enabled) {
+      await acquireWakeLock();
+      // Heartbeat: recheck every 20s — some browsers silently drop the lock
+      if (!wakeLockHeartbeat) {
+        wakeLockHeartbeat = setInterval(() => {
+          if (getConfig().keepAwake !== false) acquireWakeLock();
+        }, 20000);
+      }
+    } else {
+      releaseWakeLock();
+    }
+  }
+
+  // Re-acquire whenever the page becomes visible again
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') applyWakeLock();
+    if (document.visibilityState === 'visible' && getConfig().keepAwake !== false) {
+      acquireWakeLock();
+    }
+  });
+  window.addEventListener('focus', () => {
+    if (getConfig().keepAwake !== false) acquireWakeLock();
   });
 
   function getConfig() {
