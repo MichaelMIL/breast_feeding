@@ -25,7 +25,7 @@
   <!-- Nursing -->
   <div class="btn-group">
     <div class="section-label" data-i18n="nursing">Nursing</div>
-    <div class="btn-row">
+    <div class="btn-row" dir="ltr">
 
       <!-- LEFT BREAST -->
       <div class="breast-wrap left">
@@ -119,7 +119,7 @@
   <!-- Pumping -->
   <div class="btn-group">
     <div class="section-label" data-i18n="pumping">Pumping</div>
-    <div class="btn-row">
+    <div class="btn-row" dir="ltr">
 
       <!-- LEFT PUMP -->
       <div class="pump-wrap left">
@@ -230,7 +230,10 @@
   <div id="page-stats" class="page">
     <div style="width:100%;max-width:380px;margin-bottom:12px;">
       <h2 style="font-size:1.2rem;font-weight:700;color:var(--heading);margin-bottom:10px;" data-i18n="statistics">Statistics</h2>
-      <button class="export-btn" onclick="exportCSV()" data-i18n="exportCSV">↓ Export CSV</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="export-btn" onclick="openFullHistory()" data-i18n="fullHistory">📋 Full History</button>
+        <button class="export-btn" onclick="exportCSV()" data-i18n="exportCSV">↓ Export CSV</button>
+      </div>
     </div>
 
     <div class="stats-grid">
@@ -416,6 +419,20 @@
     </div>
   </div>
 
+  <!-- Full history overlay -->
+  <div class="overlay" id="historyOverlay" onclick="closeFullHistory()">
+    <div class="modal modal-lg" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h2 data-i18n="fullHistory">Full History</h2>
+        <button onclick="closeFullHistory()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-sub);line-height:1;">✕</button>
+      </div>
+      <div class="full-history-list" id="fullHistoryList"></div>
+    </div>
+  </div>
+
+  <!-- Hidden CSV import input -->
+  <input type="file" id="importCsvInput" accept=".csv" style="display:none" onchange="importCSV(event)"/>
+
   <!-- Settings modal -->
   <div class="overlay" id="overlay" onclick="closeSettings()">
     <div class="modal" onclick="event.stopPropagation()">
@@ -466,6 +483,11 @@
           <button id="langEn" class="lang-btn" onclick="switchLang('en')">EN</button>
           <button id="langHe" class="lang-btn" onclick="switchLang('he')">עב</button>
         </div>
+      </div>
+
+      <div class="setting-row">
+        <label data-i18n="importCSV">Import CSV</label>
+        <button class="lang-btn" onclick="triggerImportCSV()" data-i18n="importBtn">Import</button>
       </div>
 
       <div class="modal-btns">

@@ -403,6 +403,7 @@
 
     .med-card-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
     .med-last { font-size: 0.75rem; color: var(--text-sub); }
+    .take-btn-group { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
     .take-btn {
       padding: 6px 16px; background: var(--accent); color: #fff; border: none;
       border-radius: 99px; font-size: 0.82rem; font-weight: 700; cursor: pointer;
@@ -410,6 +411,14 @@
       -webkit-tap-highlight-color: transparent;
     }
     .take-btn:hover { opacity: 0.85; }
+    .take-other-btn {
+      padding: 6px 10px; background: var(--accent-faint); color: var(--accent);
+      border: 1.5px solid var(--border); border-radius: 99px;
+      font-size: 0.9rem; cursor: pointer; line-height: 1;
+      transition: opacity 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .take-other-btn:hover { opacity: 0.75; }
 
     .med-empty { text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: 28px 0; }
 
@@ -429,6 +438,22 @@
     .chart-day { font-size: 0.65rem; color: var(--text-muted); font-weight: 600; }
     .chart-num { font-size: 0.65rem; color: var(--accent); font-weight: 700; }
     .stats-section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b09080; margin-bottom: 10px; }
+
+    /* ── full history overlay ── */
+    .modal-lg {
+      width: min(460px, 96vw);
+      max-height: 82vh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 16px;
+    }
+    .full-history-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
 
     /* ── med stats breakdown ── */
     .med-stat-row { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-bottom: 1px solid var(--border-soft); }

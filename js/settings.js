@@ -33,3 +33,38 @@
     document.getElementById('langEn').className = 'lang-btn' + (lang === 'en' ? ' active' : '');
     document.getElementById('langHe').className = 'lang-btn' + (lang === 'he' ? ' active' : '');
   }
+
+  function triggerImportCSV() {
+    document.getElementById('importCsvInput').click();
+  }
+
+  function importCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const lines = e.target.result.trim().split('\n');
+      if (lines.length < 2) { alert(t('importNoData')); return; }
+      const imported = [];
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(',');
+        if (cols.length < 5) continue;
+        const ts   = parseInt(cols[4].trim());
+        const type = (cols[2] || '').trim().toLowerCase();
+        const side = (cols[3] || '').trim().toLowerCase();
+        if (isNaN(ts) || !['feed','pump'].includes(type) || !['left','right'].includes(side)) continue;
+        imported.push({ side, type, time: ts });
+      }
+      if (!imported.length) { alert(t('importNoValid')); event.target.value = ''; return; }
+      const existing   = getLog();
+      const existingTs = new Set(existing.map(e => e.time));
+      const newEntries = imported.filter(e => !existingTs.has(e.time));
+      const merged     = [...existing, ...newEntries].sort((a,b) => b.time - a.time);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      renderHistory();
+      alert(t('importSuccess', newEntries.length));
+      event.target.value = '';
+      closeSettings();
+    };
+    reader.readAsText(file);
+  }

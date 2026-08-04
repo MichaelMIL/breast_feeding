@@ -39,6 +39,20 @@
     renderMeds();
   }
 
+  function takeNowImmediate(id) {
+    unlockAudio();
+    const meds = getMeds();
+    const med = meds.find(m => m.id === id);
+    if (!med) return;
+    const time = Date.now();
+    med.lastTaken = time;
+    saveMeds(meds);
+    medAlerted.delete(id);
+    addMedHistory({ medName: med.name, time });
+    renderMeds();
+    renderHistory();
+  }
+
   function openTakeMed(id) {
     const med = getMeds().find(m => m.id === id);
     if (!med) return;
@@ -130,7 +144,10 @@
         <div class="med-countdown ${countdownClass}">${countdownText}</div>
         <div class="med-card-bottom">
           <span class="med-last">${lastTakenText}</span>
-          <button class="take-btn" onclick="openTakeMed('${med.id}')">${t('takeNow')}</button>
+          <div class="take-btn-group">
+            <button class="take-btn" onclick="takeNowImmediate('${med.id}')">${t('takeNow')}</button>
+            <button class="take-other-btn" onclick="openTakeMed('${med.id}')" aria-label="${t('takeOtherTime')}">⏱</button>
+          </div>
         </div>
       </div>`;
     }).join('');

@@ -77,6 +77,13 @@ const STRINGS = {
     medsBreakdown:  'Per medication',
     noMedHistory:   'No doses recorded yet',
     todayDoses:     d => `today: ${d}`,
+    takeOtherTime:  'Set time…',
+    fullHistory:    'Full History',
+    importCSV:      'Import CSV',
+    importBtn:      'Import',
+    importSuccess:  n => `Imported ${n} new entr${n === 1 ? 'y' : 'ies'}.`,
+    importNoData:   'No data found in file.',
+    importNoValid:  'No valid entries found.',
   },
   he: {
     appTitle:       'מעקב הנקה',
@@ -154,6 +161,13 @@ const STRINGS = {
     medsBreakdown:  'לפי תרופה',
     noMedHistory:   'אין מנות מתועדות עדיין',
     todayDoses:     d => `היום: ${d}`,
+    takeOtherTime:  'קבע שעה…',
+    fullHistory:    'היסטוריה מלאה',
+    importCSV:      'ייבוא CSV',
+    importBtn:      'ייבוא',
+    importSuccess:  n => `יובאו ${n} רשומות חדשות.`,
+    importNoData:   'לא נמצאו נתונים בקובץ.',
+    importNoValid:  'לא נמצאו רשומות תקינות.',
   }
 };
 
