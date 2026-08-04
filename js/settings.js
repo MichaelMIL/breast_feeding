@@ -34,6 +34,17 @@
     document.getElementById('langHe').className = 'lang-btn' + (lang === 'he' ? ' active' : '');
   }
 
+  function resetApp() {
+    if (!confirm(t('resetConfirm'))) return;
+    [STORAGE_KEY, TIMER_KEY, DIAPER_KEY, MED_KEY, MED_HISTORY_KEY].forEach(k => localStorage.removeItem(k));
+    if (timerInterval) clearInterval(timerInterval);
+    resetTimerUI();
+    renderHistory();
+    renderMeds();
+    renderDiapers();
+    closeSettings();
+  }
+
   function triggerImportCSV() {
     document.getElementById('importCsvInput').click();
   }

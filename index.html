@@ -216,9 +216,6 @@
   <div class="history-section">
     <div class="history-header">
       <span class="history-title" data-i18n="history">History</span>
-      <div class="history-actions">
-        <button class="clear-btn" onclick="clearHistory()" data-i18n="clearAll">Clear all</button>
-      </div>
     </div>
     <div class="history-list" id="historyList"></div>
   </div>
@@ -517,6 +514,11 @@
       <div class="setting-row">
         <label data-i18n="importCSV">Import CSV</label>
         <button class="lang-btn" onclick="triggerImportCSV()" data-i18n="importBtn">Import</button>
+      </div>
+
+      <div class="setting-row">
+        <label data-i18n="resetApp">Reset all data</label>
+        <button class="lang-btn reset-btn" onclick="resetApp()" data-i18n="resetApp">Reset all data</button>
       </div>
 
       <div class="modal-btns">

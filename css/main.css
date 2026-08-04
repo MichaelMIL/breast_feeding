@@ -280,6 +280,8 @@
       font-weight: 600; transition: border-color 0.15s, background 0.15s;
     }
     .lang-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+    .reset-btn { border-color: #c05050; color: #c05050; }
+    .reset-btn:hover { background: #c05050; color: #fff; }
 
     /* ── pages ── */
     .page { display: none; width: 100%; max-width: 400px; flex-direction: column; align-items: center; }
