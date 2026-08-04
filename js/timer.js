@@ -27,9 +27,10 @@
     const { side, type, start } = JSON.parse(raw);
     const remaining = durationFor(type) - (Date.now() - start);
 
-    const typeLabel = type === 'pump' ? t('pumped') : t('fed');
-    const sideLabel = t(side);
-    document.getElementById('timerSide').textContent = `${t('lastFed')} ${typeLabel} ${sideLabel}`;
+    const lastFeedSide = localStorage.getItem(LAST_FEED_KEY);
+    document.getElementById('timerSide').textContent = lastFeedSide
+      ? `${t('lastFed')} ${t('fed')} ${t(lastFeedSide)}`
+      : '—';
 
     const dispEl = document.getElementById('timerDisplay');
     document.getElementById('stopBtn').textContent = t('stopBtn');

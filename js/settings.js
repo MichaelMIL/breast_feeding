@@ -36,7 +36,7 @@
 
   function resetApp() {
     if (!confirm(t('resetConfirm'))) return;
-    [STORAGE_KEY, TIMER_KEY, DIAPER_KEY, MED_KEY, MED_HISTORY_KEY].forEach(k => localStorage.removeItem(k));
+    [STORAGE_KEY, TIMER_KEY, DIAPER_KEY, MED_KEY, MED_HISTORY_KEY, LAST_FEED_KEY].forEach(k => localStorage.removeItem(k));
     if (timerInterval) clearInterval(timerInterval);
     resetTimerUI();
     renderHistory();

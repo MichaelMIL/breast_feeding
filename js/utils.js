@@ -1,8 +1,9 @@
-  const APP_VERSION = "1.17";
-  const STORAGE_KEY = 'feedingLog';
-  const TIMER_KEY   = 'feedingTimer';
-  const CFG_KEY     = 'feedingConfig';
+  const APP_VERSION = "1.18";
+  const STORAGE_KEY    = 'feedingLog';
+  const TIMER_KEY      = 'feedingTimer';
+  const CFG_KEY        = 'feedingConfig';
   const MED_HISTORY_KEY = 'medHistory';
+  const LAST_FEED_KEY  = 'lastFeedSide';
 
   function getConfig() {
     const saved = JSON.parse(localStorage.getItem(CFG_KEY) || '{}');

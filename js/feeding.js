@@ -28,6 +28,7 @@
     }
     entries.unshift({ side, type, time: Date.now() });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    if (type === 'feed') localStorage.setItem(LAST_FEED_KEY, side);
     localStorage.setItem(TIMER_KEY, JSON.stringify({ side, type, start: Date.now() }));
     startTimer();
     renderHistory();
@@ -146,6 +147,7 @@
     if (!confirm(t('clearAllConfirm'))) return;
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(TIMER_KEY);
+    localStorage.removeItem(LAST_FEED_KEY);
     if (timerInterval) clearInterval(timerInterval);
     resetTimerUI();
     renderHistory();
