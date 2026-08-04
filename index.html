@@ -55,8 +55,30 @@
     .timer-label { font-size: 0.78rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
     .timer-side  { font-size: 0.92rem; font-weight: 600; color: #c0724a; margin-bottom: 2px; }
     .timer-display { font-size: 2.5rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #3a2a1e; }
-    .timer-display.done    { color: #c0724a; }
-    .timer-display.running { color: #2d7a4a; }
+    .timer-display.done    { color: #c0724a; animation: timerPulse 1s ease-in-out infinite; }
+    .timer-display.running { color: #2d7a4a; animation: none; }
+
+    @keyframes timerPulse {
+      0%, 100% { transform: scale(1);    opacity: 1; }
+      50%       { transform: scale(1.08); opacity: 0.75; }
+    }
+
+    /* screen flash overlay */
+    .flash {
+      position: fixed; inset: 0; pointer-events: none; z-index: 300;
+      background: #fff5e0; opacity: 0;
+    }
+    @keyframes screenFlash {
+      0%   { opacity: 0; }
+      8%   { opacity: 0.85; }
+      20%  { opacity: 0; }
+      30%  { opacity: 0.75; }
+      42%  { opacity: 0; }
+      50%  { opacity: 0.60; }
+      62%  { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    .flash.go { animation: screenFlash 1.8s ease-out forwards; }
 
     /* ── section label ── */
     .section-label {
@@ -274,6 +296,7 @@
   </style>
 </head>
 <body>
+  <div class="flash" id="flashOverlay"></div>
 
   <div class="header">
     <h1>Feeding Tracker</h1>
@@ -603,7 +626,7 @@
   </nav>
 
 <script>
-  const APP_VERSION = "1.4";
+  const APP_VERSION = "1.5";
   const STORAGE_KEY = 'feedingLog';
   const TIMER_KEY   = 'feedingTimer';
   const CFG_KEY     = 'feedingConfig';
@@ -644,6 +667,16 @@
         osc.stop(t + 1.4);
       });
     });
+  }
+
+  function triggerAlert() {
+    // Vibration pattern (works on Android; iOS Safari ignores silently)
+    if ('vibrate' in navigator) navigator.vibrate([600, 150, 600, 150, 800]);
+    // Screen flash (works everywhere, including iOS silent mode)
+    const el = document.getElementById('flashOverlay');
+    el.classList.remove('go');
+    void el.offsetWidth; // force reflow to restart animation
+    el.classList.add('go');
   }
 
   // Wake lock
@@ -713,7 +746,7 @@
 
     const dispEl = document.getElementById('timerDisplay');
     if (remaining <= 0) {
-      if (!chimePlayed) { chimePlayed = true; playChime(); }
+      if (!chimePlayed) { chimePlayed = true; playChime(); triggerAlert(); }
       dispEl.textContent = 'Feed now!';
       dispEl.className = 'timer-display done';
     } else {
