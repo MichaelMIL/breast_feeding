@@ -228,7 +228,7 @@
 
   <!-- Stats page -->
   <div id="page-stats" class="page">
-    <div style="width:100%;max-width:380px;margin-bottom:12px;">
+    <div style="width:100%;max-width:380px;margin-bottom:14px;">
       <h2 style="font-size:1.2rem;font-weight:700;color:var(--heading);margin-bottom:10px;" data-i18n="statistics">Statistics</h2>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="export-btn" onclick="openFullHistory()" data-i18n="fullHistory">📋 Full History</button>
@@ -236,108 +236,137 @@
       </div>
     </div>
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-card-label" data-i18n="today">Today</div>
-        <div class="stat-card-value" id="st-today">—</div>
-        <div class="stat-card-sub" id="st-today-sub"></div>
+    <!-- ── Feeding section ── -->
+    <div class="stat-section">
+      <div class="stat-section-header" onclick="toggleSection('feeding')">
+        <span class="stat-section-title" data-i18n="sectionFeeding">🤱 Feeding</span>
+        <span class="stat-section-chevron" id="chev-feeding">▼</span>
       </div>
-      <div class="stat-card">
-        <div class="stat-card-label" data-i18n="last7days">Last 7 days</div>
-        <div class="stat-card-value" id="st-week">—</div>
-        <div class="stat-card-sub" id="st-week-sub"></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-label" data-i18n="avgInterval">Avg. interval</div>
-        <div class="stat-card-value" id="st-interval">—</div>
-        <div class="stat-card-sub" data-i18n="betweenSessions">between sessions</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-label" data-i18n="totalSessions">Total sessions</div>
-        <div class="stat-card-value" id="st-total">—</div>
-        <div class="stat-card-sub" id="st-total-sub"></div>
-      </div>
-
-      <div class="stat-card wide">
-        <div class="stat-card-label" style="margin-bottom:12px;" data-i18n="lrSplit">Left / Right split</div>
-        <div class="split-row">
-          <span class="split-label" style="color:#c0507a;" data-i18n="left">Left</span>
-          <div class="split-track"><div class="split-fill split-left-fill" id="st-left-bar" style="width:50%"></div></div>
-          <span class="split-pct" id="st-left-pct">—</span>
+      <div class="stat-section-body" id="section-feeding">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-label" data-i18n="today">Today</div>
+            <div class="stat-card-value" id="st-today">—</div>
+            <div class="stat-card-sub" id="st-today-sub"></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label" data-i18n="last7days">Last 7 days</div>
+            <div class="stat-card-value" id="st-week">—</div>
+            <div class="stat-card-sub" id="st-week-sub"></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label" data-i18n="avgInterval">Avg. interval</div>
+            <div class="stat-card-value" id="st-interval">—</div>
+            <div class="stat-card-sub" data-i18n="betweenSessions">between sessions</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label" data-i18n="totalSessions">Total sessions</div>
+            <div class="stat-card-value" id="st-total">—</div>
+            <div class="stat-card-sub" id="st-total-sub"></div>
+          </div>
+          <div class="stat-card wide">
+            <div class="stat-card-label" style="margin-bottom:12px;" data-i18n="lrSplit">Left / Right split</div>
+            <div class="split-row">
+              <span class="split-label" style="color:#c0507a;" data-i18n="left">Left</span>
+              <div class="split-track"><div class="split-fill split-left-fill" id="st-left-bar" style="width:50%"></div></div>
+              <span class="split-pct" id="st-left-pct">—</span>
+            </div>
+            <div class="split-row">
+              <span class="split-label" style="color:#4a80c0;" data-i18n="right">Right</span>
+              <div class="split-track"><div class="split-fill split-right-fill" id="st-right-bar" style="width:50%"></div></div>
+              <span class="split-pct" id="st-right-pct">—</span>
+            </div>
+          </div>
+          <div class="stat-card wide">
+            <div class="stat-card-label" style="margin-bottom:12px;" data-i18n="fpSplit">Feed / Pump split</div>
+            <div class="split-row">
+              <span class="split-label" style="color:#c0507a;" data-i18n="feed">Feed</span>
+              <div class="split-track"><div class="split-fill split-feed-fill" id="st-feed-bar" style="width:50%"></div></div>
+              <span class="split-pct" id="st-feed-pct">—</span>
+            </div>
+            <div class="split-row">
+              <span class="split-label" style="color:#9060b0;" data-i18n="pump">Pump</span>
+              <div class="split-track"><div class="split-fill split-pump-fill" id="st-pump-bar" style="width:50%"></div></div>
+              <span class="split-pct" id="st-pump-pct">—</span>
+            </div>
+          </div>
+          <div class="stat-card wide">
+            <div class="stat-card-label" data-i18n="chart7feeding">Last 7 days — feeding</div>
+            <div class="chart-bars" id="st-chart"></div>
+          </div>
         </div>
-        <div class="split-row">
-          <span class="split-label" style="color:#4a80c0;" data-i18n="right">Right</span>
-          <div class="split-track"><div class="split-fill split-right-fill" id="st-right-bar" style="width:50%"></div></div>
-          <span class="split-pct" id="st-right-pct">—</span>
-        </div>
-      </div>
-
-      <div class="stat-card wide">
-        <div class="stat-card-label" style="margin-bottom:12px;" data-i18n="fpSplit">Feed / Pump split</div>
-        <div class="split-row">
-          <span class="split-label" style="color:#c0507a;" data-i18n="feed">Feed</span>
-          <div class="split-track"><div class="split-fill split-feed-fill" id="st-feed-bar" style="width:50%"></div></div>
-          <span class="split-pct" id="st-feed-pct">—</span>
-        </div>
-        <div class="split-row">
-          <span class="split-label" style="color:#9060b0;" data-i18n="pump">Pump</span>
-          <div class="split-track"><div class="split-fill split-pump-fill" id="st-pump-bar" style="width:50%"></div></div>
-          <span class="split-pct" id="st-pump-pct">—</span>
-        </div>
-      </div>
-
-      <div class="stat-card wide">
-        <div class="stat-card-label" data-i18n="chart7feeding">Last 7 days — feeding</div>
-        <div class="chart-bars" id="st-chart"></div>
-      </div>
-
-      <!-- Diaper stats -->
-      <div class="stat-card">
-        <div class="stat-card-label" data-i18n="diapersToday">Diapers today</div>
-        <div class="stat-card-value" id="st-diaper-today">—</div>
-        <div class="stat-card-sub" id="st-diaper-today-sub"></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-label" data-i18n="diapers7days">Diapers 7 days</div>
-        <div class="stat-card-value" id="st-diaper-week">—</div>
-        <div class="stat-card-sub" id="st-diaper-week-sub"></div>
-      </div>
-
-      <div class="stat-card wide">
-        <div class="stat-card-label" style="margin-bottom:12px;" data-i18n="peePoop">Pee / Poop split</div>
-        <div class="split-row">
-          <span class="split-label" style="color:#c09010;" data-i18n="pee">Pee</span>
-          <div class="split-track"><div class="split-fill split-pee-fill"  id="st-pee-bar"  style="width:50%"></div></div>
-          <span class="split-pct" id="st-pee-pct">—</span>
-        </div>
-        <div class="split-row">
-          <span class="split-label" style="color:#a06830;" data-i18n="poop">Poop</span>
-          <div class="split-track"><div class="split-fill split-poop-fill" id="st-poop-bar" style="width:50%"></div></div>
-          <span class="split-pct" id="st-poop-pct">—</span>
-        </div>
-      </div>
-
-      <div class="stat-card wide">
-        <div class="stat-card-label" data-i18n="chart7diapers">Last 7 days — diapers</div>
-        <div class="chart-bars" id="st-diaper-chart"></div>
-      </div>
-
-      <!-- Medication stats -->
-      <div class="stat-card">
-        <div class="stat-card-label" data-i18n="medsDosesToday">Doses today</div>
-        <div class="stat-card-value" id="st-med-today">—</div>
-        <div class="stat-card-sub" id="st-med-today-sub"></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-label" data-i18n="medsDosesWeek">Doses 7 days</div>
-        <div class="stat-card-value" id="st-med-week">—</div>
-        <div class="stat-card-sub" id="st-med-week-sub"></div>
-      </div>
-      <div class="stat-card wide">
-        <div class="stat-card-label" data-i18n="medsBreakdown">Per medication</div>
-        <div id="st-med-breakdown"></div>
       </div>
     </div>
+
+    <!-- ── Diapers section ── -->
+    <div class="stat-section">
+      <div class="stat-section-header" onclick="toggleSection('diapers')">
+        <span class="stat-section-title" data-i18n="sectionDiapers">🩲 Diapers</span>
+        <span class="stat-section-chevron" id="chev-diapers">▼</span>
+      </div>
+      <div class="stat-section-body" id="section-diapers">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-label" data-i18n="diapersToday">Diapers today</div>
+            <div class="stat-card-value" id="st-diaper-today">—</div>
+            <div class="stat-card-sub" id="st-diaper-today-sub"></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label" data-i18n="diapers7days">Diapers 7 days</div>
+            <div class="stat-card-value" id="st-diaper-week">—</div>
+            <div class="stat-card-sub" id="st-diaper-week-sub"></div>
+          </div>
+          <div class="stat-card wide">
+            <div class="stat-card-label" style="margin-bottom:12px;" data-i18n="peePoop">Pee / Poop split</div>
+            <div class="split-row">
+              <span class="split-label" style="color:#c09010;" data-i18n="pee">Pee</span>
+              <div class="split-track"><div class="split-fill split-pee-fill" id="st-pee-bar" style="width:50%"></div></div>
+              <span class="split-pct" id="st-pee-pct">—</span>
+            </div>
+            <div class="split-row">
+              <span class="split-label" style="color:#a06830;" data-i18n="poop">Poop</span>
+              <div class="split-track"><div class="split-fill split-poop-fill" id="st-poop-bar" style="width:50%"></div></div>
+              <span class="split-pct" id="st-poop-pct">—</span>
+            </div>
+          </div>
+          <div class="stat-card wide">
+            <div class="stat-card-label" data-i18n="chart7diapers">Last 7 days — diapers</div>
+            <div class="chart-bars" id="st-diaper-chart"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Medications section ── -->
+    <div class="stat-section">
+      <div class="stat-section-header" onclick="toggleSection('meds')">
+        <span class="stat-section-title" data-i18n="sectionMeds">💊 Medications</span>
+        <span class="stat-section-chevron" id="chev-meds">▼</span>
+      </div>
+      <div class="stat-section-body" id="section-meds">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-label" data-i18n="medsDosesToday">Doses today</div>
+            <div class="stat-card-value" id="st-med-today">—</div>
+            <div class="stat-card-sub" id="st-med-today-sub"></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label" data-i18n="medsDosesWeek">Doses 7 days</div>
+            <div class="stat-card-value" id="st-med-week">—</div>
+            <div class="stat-card-sub" id="st-med-week-sub"></div>
+          </div>
+          <div class="stat-card wide">
+            <div class="stat-card-label" data-i18n="chart7meds">Last 7 days — medications</div>
+            <div class="chart-bars" id="st-med-chart"></div>
+          </div>
+          <div class="stat-card wide">
+            <div class="stat-card-label" data-i18n="medsBreakdown">Per medication</div>
+            <div id="st-med-breakdown"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /page-stats -->
 
   <!-- Meds page -->

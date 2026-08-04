@@ -84,6 +84,11 @@ const STRINGS = {
     importSuccess:  n => `Imported ${n} new entr${n === 1 ? 'y' : 'ies'}.`,
     importNoData:   'No data found in file.',
     importNoValid:  'No valid entries found.',
+    sectionFeeding: '🤱 Feeding',
+    sectionDiapers: '🩲 Diapers',
+    sectionMeds:    '💊 Medications',
+    chart7meds:     'Last 7 days — medications',
+    weekDoses:      'this week',
   },
   he: {
     appTitle:       'מעקב הנקה',
@@ -168,6 +173,11 @@ const STRINGS = {
     importSuccess:  n => `יובאו ${n} רשומות חדשות.`,
     importNoData:   'לא נמצאו נתונים בקובץ.',
     importNoValid:  'לא נמצאו רשומות תקינות.',
+    sectionFeeding: '🤱 האכלות',
+    sectionDiapers: '🩲 חיתולים',
+    sectionMeds:    '💊 תרופות',
+    chart7meds:     '7 ימים — תרופות',
+    weekDoses:      'השבוע',
   }
 };
 

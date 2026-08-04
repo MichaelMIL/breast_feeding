@@ -306,10 +306,29 @@
     .nav-btn .nav-icon { font-size: 1.4rem; line-height: 1; }
     .nav-btn.active { color: var(--accent); }
 
+    /* ── collapsible stat sections ── */
+    .stat-section { width: 100%; max-width: 380px; margin-bottom: 10px; }
+    .stat-section-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 13px 18px; background: var(--surface); border-radius: 14px;
+      cursor: pointer; user-select: none;
+      box-shadow: 0 2px 8px var(--shadow-sm);
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity 0.12s;
+    }
+    .stat-section-header:active { opacity: 0.75; }
+    .stat-section-title { font-size: 0.95rem; font-weight: 700; color: var(--heading); }
+    .stat-section-chevron {
+      font-size: 0.72rem; color: var(--text-sub);
+      display: inline-block; transition: transform 0.22s ease;
+    }
+    .stat-section-body { display: none; padding-top: 10px; }
+    .stat-section-body.open { display: block; }
+
     /* ── stats page ── */
     .stats-grid {
       display: grid; grid-template-columns: 1fr 1fr;
-      gap: 12px; width: 100%; max-width: 380px; margin-bottom: 14px;
+      gap: 12px; width: 100%; max-width: 380px; margin-bottom: 4px;
     }
     .stat-card {
       background: var(--surface); border-radius: 16px; padding: 16px;
@@ -456,7 +475,9 @@
     }
 
     /* ── med stats breakdown ── */
-    .med-stat-row { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-bottom: 1px solid var(--border-soft); }
-    .med-stat-row:last-child { border-bottom: none; }
+    .med-stat-row { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--border-soft); }
+    .med-stat-row:last-child { border-bottom: none; padding-bottom: 2px; }
+    .med-stat-header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
     .med-stat-name { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+    .med-stat-badge { font-size: 0.72rem; font-weight: 700; color: #6050b0; background: #eeeaff; padding: 2px 7px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
     .med-stat-info { font-size: 0.75rem; color: var(--text-sub); }
