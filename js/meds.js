@@ -120,11 +120,9 @@
       const countdownClass = isDue ? 'due' : 'ok';
       const countdownText  = isDue ? t('dueNow') : fmtCountdown(remaining);
 
-      // Fire alert once per due event
+      // Track due state (no audio/flash for meds — card turns red instead)
       if (isDue && !medAlerted.has(med.id)) {
         medAlerted.add(med.id);
-        playChime();
-        triggerAlert();
       } else if (!isDue && medAlerted.has(med.id)) {
         medAlerted.delete(med.id);
       }
@@ -168,8 +166,6 @@
           const remaining  = med.lastTaken ? (med.lastTaken + intervalMs) - now : 0;
           if (remaining <= 0 && !medAlerted.has(med.id)) {
             medAlerted.add(med.id);
-            playChime();
-            triggerAlert();
           }
         });
       }
