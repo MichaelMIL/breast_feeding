@@ -57,6 +57,13 @@
     .timer-display { font-size: 2.5rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #3a2a1e; }
     .timer-display.done    { color: #c0724a; animation: timerPulse 1s ease-in-out infinite; }
     .timer-display.running { color: #2d7a4a; animation: none; }
+    .stop-btn {
+      margin-top: 10px; padding: 5px 18px;
+      background: none; border: 1.5px solid #ddd; border-radius: 99px;
+      font-size: 0.75rem; font-weight: 700; color: #bbb; cursor: pointer;
+      letter-spacing: 0.05em; transition: border-color 0.15s, color 0.15s;
+    }
+    .stop-btn:hover { border-color: #c05050; color: #c05050; }
 
     @keyframes timerPulse {
       0%, 100% { transform: scale(1);    opacity: 1; }
@@ -307,6 +314,7 @@
     <div class="timer-label">Next feeding in</div>
     <div class="timer-side" id="timerSide">—</div>
     <div class="timer-display" id="timerDisplay">—</div>
+    <button class="stop-btn" id="stopBtn" onclick="stopTimer()" style="display:none">■ Stop</button>
   </div>
 
   <div id="page-tracker" class="page active">
@@ -629,7 +637,7 @@
   </nav>
 
 <script>
-  const APP_VERSION = "1.6";
+  const APP_VERSION = "1.7";
   const STORAGE_KEY = 'feedingLog';
   const TIMER_KEY   = 'feedingTimer';
   const CFG_KEY     = 'feedingConfig';
@@ -778,6 +786,14 @@
     tick();
   }
 
+  function stopTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+    localStorage.removeItem(TIMER_KEY);
+    chimePlayed = false;
+    resetTimerUI();
+  }
+
   function tick() {
     const raw = localStorage.getItem(TIMER_KEY);
     if (!raw) { resetTimerUI(); return; }
@@ -789,6 +805,7 @@
     document.getElementById('timerSide').textContent = `Last: ${typeLabel} ${sideLabel}`;
 
     const dispEl = document.getElementById('timerDisplay');
+    document.getElementById('stopBtn').style.display = 'inline-block';
     if (remaining <= 0) {
       if (!chimePlayed) { chimePlayed = true; playChime(); triggerAlert(); }
       dispEl.textContent = 'Feed now!';
@@ -805,6 +822,7 @@
     document.getElementById('timerSide').textContent = '—';
     const d = document.getElementById('timerDisplay');
     d.textContent = '—'; d.className = 'timer-display';
+    document.getElementById('stopBtn').style.display = 'none';
   }
 
   function renderHistory() {
