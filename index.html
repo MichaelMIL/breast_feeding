@@ -187,6 +187,24 @@
     .btn-cancel { background: #f0e8e0; color: #7a4a2e; }
     .btn-save:hover, .btn-cancel:hover { opacity: 0.85; }
 
+    /* toggle switch */
+    .toggle-wrap { display: flex; align-items: center; gap: 10px; }
+    .toggle { position: relative; width: 44px; height: 26px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0; border-radius: 99px;
+      background: #ddd; cursor: pointer; transition: background 0.2s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #fff; top: 3px; left: 3px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+    .toggle input:checked + .toggle-slider { background: #c0724a; }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+
     /* ── pages ── */
     .page { display: none; width: 100%; max-width: 400px; flex-direction: column; align-items: center; }
     .page.active { display: flex; }
@@ -558,6 +576,16 @@
         </div>
       </div>
 
+      <div class="setting-row">
+        <label>Keep screen on</label>
+        <div class="toggle-wrap">
+          <label class="toggle">
+            <input type="checkbox" id="cfgWakeLock" checked/>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
       <div class="modal-btns">
         <button class="btn-save"   onclick="saveSettings()">Save</button>
         <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
@@ -575,7 +603,7 @@
   </nav>
 
 <script>
-  const APP_VERSION = "1.3";
+  const APP_VERSION = "1.4";
   const STORAGE_KEY = 'feedingLog';
   const TIMER_KEY   = 'feedingTimer';
   const CFG_KEY     = 'feedingConfig';
@@ -618,11 +646,34 @@
     });
   }
 
+  // Wake lock
+  let wakeLock = null;
+
+  async function applyWakeLock() {
+    const enabled = getConfig().keepAwake !== false;
+    if (enabled && 'wakeLock' in navigator) {
+      try {
+        if (!wakeLock || wakeLock.released) {
+          wakeLock = await navigator.wakeLock.request('screen');
+        }
+      } catch (_) {}
+    } else if (wakeLock && !wakeLock.released) {
+      wakeLock.release();
+      wakeLock = null;
+    }
+  }
+
+  // Re-acquire after tab comes back (iOS/Android release it on hide)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') applyWakeLock();
+  });
+
   function getConfig() {
     const saved = JSON.parse(localStorage.getItem(CFG_KEY) || '{}');
     return {
-      feedMins: saved.feedMins ?? 20,
-      pumpMins: saved.pumpMins ?? 5,
+      feedMins:  saved.feedMins  ?? 20,
+      pumpMins:  saved.pumpMins  ?? 5,
+      keepAwake: saved.keepAwake ?? true,
     };
   }
 
@@ -741,17 +792,20 @@
   // Settings
   function openSettings() {
     const cfg = getConfig();
-    document.getElementById('cfgFeed').value = cfg.feedMins;
-    document.getElementById('cfgPump').value = cfg.pumpMins;
+    document.getElementById('cfgFeed').value      = cfg.feedMins;
+    document.getElementById('cfgPump').value      = cfg.pumpMins;
+    document.getElementById('cfgWakeLock').checked = cfg.keepAwake;
     document.getElementById('overlay').classList.add('open');
   }
   function closeSettings() {
     document.getElementById('overlay').classList.remove('open');
   }
   function saveSettings() {
-    const feedMins = Math.max(1, parseInt(document.getElementById('cfgFeed').value) || 20);
-    const pumpMins = Math.max(1, parseInt(document.getElementById('cfgPump').value) || 5);
-    localStorage.setItem(CFG_KEY, JSON.stringify({ feedMins, pumpMins }));
+    const feedMins  = Math.max(1, parseInt(document.getElementById('cfgFeed').value) || 20);
+    const pumpMins  = Math.max(1, parseInt(document.getElementById('cfgPump').value) || 5);
+    const keepAwake = document.getElementById('cfgWakeLock').checked;
+    localStorage.setItem(CFG_KEY, JSON.stringify({ feedMins, pumpMins, keepAwake }));
+    applyWakeLock();
     closeSettings();
   }
 
@@ -846,6 +900,7 @@
   function setBar(id, pct)  { document.getElementById(id).style.width = pct + '%'; }
 
   // Init
+  applyWakeLock();
   renderHistory();
   document.getElementById('appVersion').textContent = `v${APP_VERSION}`;
   const savedTimer = localStorage.getItem(TIMER_KEY);
