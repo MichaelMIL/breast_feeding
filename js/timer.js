@@ -41,10 +41,9 @@
         playChime();
         triggerAlert();
         setLastEntryDuration(durationFor(type));
-        renderHistory();
+        stopTimer();
+        return;
       }
-      dispEl.textContent = t('feedNow');
-      dispEl.className = 'timer-display done';
     } else {
       const mins = Math.floor(remaining / 60000);
       const secs = Math.floor((remaining % 60000) / 1000);
