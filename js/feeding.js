@@ -171,27 +171,71 @@
   }
 
   function exportCSV() {
-    const entries = getLog();
-    if (entries.length === 0) { alert(t('noData')); return; }
-    const rows = [['Date', 'Time', 'Type', 'Side', 'Unix Timestamp']];
-    entries.forEach(e => {
+    const sections = [];
+
+    // Settings
+    const cfg  = getConfig();
+    const lang = getLang();
+    sections.push('### SETTINGS ###');
+    sections.push('feedMins,pumpMins,keepAwake,nightMode,lang');
+    sections.push([cfg.feedMins, cfg.pumpMins, cfg.keepAwake, cfg.nightMode, lang].join(','));
+
+    // Feeding & pumping
+    sections.push('### FEEDING ###');
+    sections.push('Date,Time,Type,Side,Duration (ms),Unix Timestamp');
+    getLog().forEach(e => {
       const d    = new Date(e.time);
       const date = d.toLocaleDateString([], { year: 'numeric', month: '2-digit', day: '2-digit' });
       const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       const type = (e.type || 'feed').charAt(0).toUpperCase() + (e.type || 'feed').slice(1);
       const side = e.side.charAt(0).toUpperCase() + e.side.slice(1);
-      rows.push([date, time, type, side, e.time]);
+      sections.push([date, time, type, side, e.duration || '', e.time].join(','));
     });
-    const csv  = rows.map(r => r.join(',')).join('\n');
+
+    // Diapers
+    sections.push('### DIAPERS ###');
+    sections.push('Date,Time,Type,Unix Timestamp');
+    getDiapers().forEach(d => {
+      const dt   = new Date(d.time);
+      const date = dt.toLocaleDateString([], { year: 'numeric', month: '2-digit', day: '2-digit' });
+      const time = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      sections.push([date, time, d.type, d.time].join(','));
+    });
+
+    // Medication definitions
+    sections.push('### MEDICATIONS ###');
+    sections.push('ID,Name,Interval (hours),Last Taken (Unix)');
+    getMeds().forEach(m => {
+      sections.push([m.id, csvQuote(m.name), m.intervalHours, m.lastTaken || ''].join(','));
+    });
+
+    // Medication dose history
+    sections.push('### MED HISTORY ###');
+    sections.push('Medication,Date,Time,Unix Timestamp');
+    getMedHistory().forEach(m => {
+      const dt   = new Date(m.time);
+      const date = dt.toLocaleDateString([], { year: 'numeric', month: '2-digit', day: '2-digit' });
+      const time = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      sections.push([csvQuote(m.medName), date, time, m.time].join(','));
+    });
+
+    const csv  = sections.join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href     = url;
-    const now = new Date();
-    const ts  = now.toISOString().slice(0,16).replace('T','_').replace(':','-');
-    a.download = `feeding-log-${ts}.csv`;
+    const now  = new Date();
+    const ts   = now.toISOString().slice(0,16).replace('T','_').replace(':','-');
+    a.download = `feeding-tracker-backup-${ts}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  function csvQuote(str) {
+    const s = String(str);
+    return s.includes(',') || s.includes('"') || s.includes('\n')
+      ? '"' + s.replace(/"/g, '""') + '"'
+      : s;
   }
 
   function clearHistory() {
