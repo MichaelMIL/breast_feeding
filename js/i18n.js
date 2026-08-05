@@ -91,6 +91,13 @@ const STRINGS = {
     sectionMeds:    '💊 Medications',
     chart7meds:     'Last 7 days — medications',
     weekDoses:      'this week',
+    manualEntry:    'Add Entry',
+    entryType:      'Entry type',
+    sideLabel:      'Side',
+    durationMin:    'Duration (min)',
+    medDose:        'Med dose',
+    optional:       'optional',
+    entrySaved:     'Entry saved.',
   },
   he: {
     appTitle:       'מעקב הנקה',
@@ -182,6 +189,13 @@ const STRINGS = {
     sectionMeds:    '💊 תרופות',
     chart7meds:     '7 ימים — תרופות',
     weekDoses:      'השבוע',
+    manualEntry:    'הוסף רשומה',
+    entryType:      'סוג רשומה',
+    sideLabel:      'צד',
+    durationMin:    'משך (דקות)',
+    medDose:        'מנת תרופה',
+    optional:       'אופציונלי',
+    entrySaved:     'הרשומה נשמרה.',
   }
 };
 

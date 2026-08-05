@@ -1,4 +1,4 @@
-  const APP_VERSION = "1.22";
+  const APP_VERSION = "1.23";
   const STORAGE_KEY    = 'feedingLog';
   const TIMER_KEY      = 'feedingTimer';
   const CFG_KEY        = 'feedingConfig';

@@ -459,6 +459,69 @@
   <!-- Hidden CSV import input -->
   <input type="file" id="importCsvInput" accept=".csv" style="display:none" onchange="importCSV(event)"/>
 
+  <!-- Manual entry overlay -->
+  <div class="overlay" id="manualEntryOverlay" onclick="closeManualEntry()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h2 data-i18n="manualEntry">Add Entry</h2>
+
+      <div class="modal-field">
+        <label data-i18n="entryType">Entry type</label>
+        <select id="manualType" onchange="updateManualFields()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.95rem;color:var(--text);background:var(--surface2);outline:none;margin-top:4px;">
+          <option value="feed"      data-i18n="feed">Feed</option>
+          <option value="pump"      data-i18n="pump">Pump</option>
+          <option value="diaper"    data-i18n="diaper">Diaper</option>
+          <option value="medhistory" data-i18n="medDose">Med dose</option>
+        </select>
+      </div>
+
+      <!-- Feed / Pump fields -->
+      <div id="manualFeedFields">
+        <div class="modal-field" style="margin-top:10px;">
+          <label data-i18n="sideLabel">Side</label>
+          <div style="display:flex;gap:8px;margin-top:6px;" dir="ltr">
+            <button id="manualLeft"  class="lang-btn active" onclick="selectManualSide('left')"  data-i18n="left">Left</button>
+            <button id="manualRight" class="lang-btn"        onclick="selectManualSide('right')" data-i18n="right">Right</button>
+          </div>
+        </div>
+        <div class="modal-field" style="margin-top:10px;">
+          <label data-i18n="durationMin">Duration (min)</label>
+          <input type="number" id="manualDuration" min="0" max="180" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.95rem;color:var(--text);background:var(--surface2);outline:none;margin-top:4px;box-sizing:border-box;" data-i18n-placeholder="optional"/>
+        </div>
+      </div>
+
+      <!-- Diaper fields -->
+      <div id="manualDiaperFields" style="display:none;">
+        <div class="modal-field" style="margin-top:10px;">
+          <div class="diaper-type-row" style="margin-top:6px;">
+            <button class="dtype-btn" id="manualDtypePee"  onclick="selectManualDtype('pee')"><span class="dtype-icon">💧</span><span data-i18n="pee">Pee</span></button>
+            <button class="dtype-btn" id="manualDtypePoop" onclick="selectManualDtype('poop')"><span class="dtype-icon">💩</span><span data-i18n="poop">Poop</span></button>
+            <button class="dtype-btn" id="manualDtypeBoth" onclick="selectManualDtype('both')"><span class="dtype-icon">💧💩</span><span data-i18n="bothLabel">Both</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Med dose fields -->
+      <div id="manualMedFields" style="display:none;">
+        <div class="modal-field" style="margin-top:10px;">
+          <label data-i18n="medName">Medication name</label>
+          <input type="text" id="manualMedName" list="manualMedList" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.95rem;color:var(--text);background:var(--surface2);outline:none;margin-top:4px;box-sizing:border-box;"/>
+          <datalist id="manualMedList"></datalist>
+        </div>
+      </div>
+
+      <!-- Common: date/time -->
+      <div class="modal-field" style="margin-top:10px;">
+        <label data-i18n="timeLabel">Time</label>
+        <input type="datetime-local" id="manualTime" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.95rem;color:var(--text);background:var(--surface2);outline:none;margin-top:4px;box-sizing:border-box;"/>
+      </div>
+
+      <div class="modal-btns" style="margin-top:18px;">
+        <button class="btn-save"   onclick="saveManualEntry()" data-i18n="save">Save</button>
+        <button class="btn-cancel" onclick="closeManualEntry()" data-i18n="cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Settings modal -->
   <div class="overlay" id="overlay" onclick="closeSettings()">
     <div class="modal" onclick="event.stopPropagation()">
@@ -509,6 +572,11 @@
           <button id="langEn" class="lang-btn" onclick="switchLang('en')">EN</button>
           <button id="langHe" class="lang-btn" onclick="switchLang('he')">עב</button>
         </div>
+      </div>
+
+      <div class="setting-row">
+        <label data-i18n="manualEntry">Add Entry</label>
+        <button class="lang-btn" onclick="openManualEntry()" data-i18n="manualEntry">Add Entry</button>
       </div>
 
       <div class="setting-row">

@@ -1,3 +1,98 @@
+  // Manual entry
+  let manualSide  = 'left';
+  let manualDtype = 'pee';
+
+  function openManualEntry() {
+    closeSettings();
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    document.getElementById('manualTime').value =
+      `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    document.getElementById('manualType').value = 'feed';
+    document.getElementById('manualDuration').value = '';
+    document.getElementById('manualMedName').value  = '';
+    manualSide  = 'left';
+    manualDtype = 'pee';
+    // Populate med name suggestions
+    const dl = document.getElementById('manualMedList');
+    dl.innerHTML = getMeds().map(m => `<option value="${escHtml(m.name)}">`).join('');
+    updateManualFields();
+    updateManualSideBtns();
+    updateManualDtypeBtns();
+    document.getElementById('manualEntryOverlay').classList.add('open');
+  }
+
+  function closeManualEntry() {
+    document.getElementById('manualEntryOverlay').classList.remove('open');
+  }
+
+  function updateManualFields() {
+    const type = document.getElementById('manualType').value;
+    document.getElementById('manualFeedFields').style.display   = (type === 'feed' || type === 'pump') ? '' : 'none';
+    document.getElementById('manualDiaperFields').style.display = type === 'diaper'     ? '' : 'none';
+    document.getElementById('manualMedFields').style.display    = type === 'medhistory' ? '' : 'none';
+  }
+
+  function selectManualSide(side) {
+    manualSide = side;
+    updateManualSideBtns();
+  }
+
+  function updateManualSideBtns() {
+    document.getElementById('manualLeft').className  = 'lang-btn' + (manualSide === 'left'  ? ' active' : '');
+    document.getElementById('manualRight').className = 'lang-btn' + (manualSide === 'right' ? ' active' : '');
+  }
+
+  function selectManualDtype(dtype) {
+    manualDtype = dtype;
+    updateManualDtypeBtns();
+  }
+
+  function updateManualDtypeBtns() {
+    document.getElementById('manualDtypePee').className  = 'dtype-btn' + (manualDtype === 'pee'  ? ' selected-pee'  : '');
+    document.getElementById('manualDtypePoop').className = 'dtype-btn' + (manualDtype === 'poop' ? ' selected-poop' : '');
+    document.getElementById('manualDtypeBoth').className = 'dtype-btn' + (manualDtype === 'both' ? ' selected-both' : '');
+  }
+
+  function saveManualEntry() {
+    const type    = document.getElementById('manualType').value;
+    const timeVal = document.getElementById('manualTime').value;
+    if (!timeVal) { alert(t('timeLabel') + '?'); return; }
+    const ts = new Date(timeVal).getTime();
+    if (isNaN(ts)) return;
+
+    if (type === 'feed' || type === 'pump') {
+      const durMins = parseFloat(document.getElementById('manualDuration').value);
+      const dur     = (!isNaN(durMins) && durMins > 0) ? Math.round(durMins * 60000) : undefined;
+      const entries = getLog();
+      entries.push({ side: manualSide, type, time: ts, ...(dur ? { duration: dur } : {}) });
+      entries.sort((a, b) => b.time - a.time);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+      renderHistory();
+    } else if (type === 'diaper') {
+      const list = getDiapers();
+      list.push({ type: manualDtype, time: ts });
+      list.sort((a, b) => b.time - a.time);
+      saveDiapers(list);
+      renderDiapers();
+    } else if (type === 'medhistory') {
+      const medName = document.getElementById('manualMedName').value.trim();
+      if (!medName) { alert(t('medName') + '?'); return; }
+      addMedHistory({ medName, time: ts });
+      // Also update lastTaken on the matching medication
+      const meds = getMeds();
+      const med  = meds.find(m => m.name.toLowerCase() === medName.toLowerCase());
+      if (med && (!med.lastTaken || ts > med.lastTaken)) {
+        med.lastTaken = ts;
+        saveMeds(meds);
+      }
+      renderMeds();
+    }
+
+    alert(t('entrySaved'));
+    closeManualEntry();
+  }
+
   // Settings
   function openSettings() {
     const cfg = getConfig();
