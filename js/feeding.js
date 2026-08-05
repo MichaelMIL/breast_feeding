@@ -83,18 +83,69 @@
     return '';
   }
 
+  function deleteHistoryEntry(logIdx) {
+    const entries = getLog();
+    entries.splice(logIdx, 1);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    renderHistory();
+  }
+
+  function addSwipeListeners() {
+    document.querySelectorAll('#historyList .swipe-wrap').forEach(wrap => {
+      const inner = wrap.querySelector('.history-item');
+      let startX = 0, startY = 0, curX = 0, tracking = false;
+
+      inner.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        curX = 0; tracking = false;
+        inner.style.transition = 'none';
+      }, { passive: true });
+
+      inner.addEventListener('touchmove', e => {
+        const dx = e.touches[0].clientX - startX;
+        const dy = e.touches[0].clientY - startY;
+        // Ignore if primarily vertical
+        if (!tracking && Math.abs(dy) > Math.abs(dx)) return;
+        tracking = true;
+        curX = Math.min(0, dx);
+        inner.style.transform = `translateX(${curX}px)`;
+      }, { passive: true });
+
+      inner.addEventListener('touchend', () => {
+        inner.style.transition = '';
+        if (curX < -wrap.offsetWidth * 0.35) {
+          inner.style.transform = `translateX(-100%)`;
+          const idx = parseInt(wrap.dataset.idx);
+          setTimeout(() => deleteHistoryEntry(idx), 200);
+        } else {
+          inner.style.transform = '';
+        }
+        curX = 0; tracking = false;
+      });
+    });
+  }
+
   function renderHistory() {
     const list = document.getElementById('historyList');
     const locale = getLang() === 'he' ? 'he-IL' : undefined;
 
-    // Tracker tab: only feeding and pumping
+    // Tracker tab: only feeding and pumping; carry original log index for delete
     const all = [];
-    getLog().forEach(e => all.push({ kind: e.type === 'pump' ? 'pump' : 'feed', side: e.side, time: e.time, duration: e.duration }));
+    getLog().forEach((e, i) => all.push({ kind: e.type === 'pump' ? 'pump' : 'feed', side: e.side, time: e.time, duration: e.duration, logIdx: i }));
     all.sort((a,b) => b.time - a.time);
 
-    list.innerHTML = all.length
-      ? all.map(e => buildHistoryItem(e, locale)).join('')
-      : `<div class="empty-state">${t('noSessions')}</div>`;
+    if (!all.length) {
+      list.innerHTML = `<div class="empty-state">${t('noSessions')}</div>`;
+      return;
+    }
+    list.innerHTML = all.map(e =>
+      `<div class="swipe-wrap" data-idx="${e.logIdx}">
+        <div class="swipe-del-bg">✕</div>
+        ${buildHistoryItem(e, locale)}
+      </div>`
+    ).join('');
+    addSwipeListeners();
   }
 
   function openFullHistory() {
