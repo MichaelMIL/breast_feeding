@@ -36,7 +36,13 @@
     document.getElementById('stopBtn').textContent = t('stopBtn');
     document.getElementById('stopBtn').style.display = 'inline-block';
     if (remaining <= 0) {
-      if (!chimePlayed) { chimePlayed = true; playChime(); triggerAlert(); }
+      if (!chimePlayed) {
+        chimePlayed = true;
+        playChime();
+        triggerAlert();
+        setLastEntryDuration(durationFor(type));
+        renderHistory();
+      }
       dispEl.textContent = t('feedNow');
       dispEl.className = 'timer-display done';
     } else {
